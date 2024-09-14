@@ -7,6 +7,7 @@ import myRestaurantRoute from "./routes/MyRestaurantRoute";
 import restaurantRoute from "./routes/RestaurantRoute";
 
 import { v2 as cloudinary } from "cloudinary";
+import orderRoute from "./routes/OrderRoute";
 
 //establish connection to database
 mongoose
@@ -22,8 +23,13 @@ cloudinary.config({
 //create express server and assign to variable app
 const app = express();
 //Middleware (automatically convert any request made to api server to json)
-app.use(express.json());
+
 app.use(cors());
+
+//stripe access
+app.use("/api/order/checkout/webhook", express.raw({ type: "*/*" }));
+
+app.use(express.json());
 
 //health endpoint, basic sanity check to see if server has started
 app.get("/health", async (req: Request, res: Response) => {
@@ -37,6 +43,7 @@ app.use("/api/my/restaurant", myRestaurantRoute);
 
 app.use("/api/restaurant", restaurantRoute);
 
+app.use("/api/order", orderRoute);
 
 app.listen(7000, () => {
   console.log("server started on localhost:7000");
